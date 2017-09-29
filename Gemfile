@@ -19,6 +19,8 @@ gem 'redis'
 gem 'multi_json'
 
 group :development, :test do
+  gem 'pry-byebug'
+  gem 'pry-rails'
   gem 'byebug', platform: :mri
   gem 'rspec-rails'
 end
