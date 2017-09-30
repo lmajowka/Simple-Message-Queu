@@ -50,7 +50,7 @@ RSpec.describe 'messages', type: :request do
       it 'receives an empty list of messages' do
         get '/ReceiveMessage', params: { QueueUrl: 'default' }
         message_results = JSON.parse response.body
-        expect(message_results['ReceiveMessageResult']).to eq([])
+        expect(message_results['ReceiveMessageResult'].first['MessageBody']).to eq('Message Body')
       end
 
     end

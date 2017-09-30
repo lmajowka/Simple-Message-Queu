@@ -2,17 +2,33 @@ class SimpleMessage
 
   attr_accessor :message_body, :message_attributes, :message_id, :md5_of_message_body, :md5_of_message_attributes
 
-  def initialize(params)
-    @message_body = params[:MessageBody]
-    @message_id = SecureRandom.hex(16)
-    @message_attributes = get_message_attributes_from_params params
-    @md5_of_message_body = Digest::MD5.hexdigest params[:MessageBody]
-    @md5_of_message_attributes = Digest::MD5.hexdigest @message_attributes.to_s
+  def initialize(params = nil)
+    if params.present?
+      params.each do |k,v|
+        instance_variable_set("@#{k}", v) unless v.nil?
+      end
+    end
+  end
+
+  def self.convert(params)
+    simple_message = new
+    simple_message.message_body = params[:MessageBody]
+    simple_message.message_id = SecureRandom.hex(16)
+    simple_message.message_attributes = get_message_attributes_from_params params
+    simple_message.md5_of_message_body = Digest::MD5.hexdigest params[:MessageBody]
+    simple_message.md5_of_message_attributes = Digest::MD5.hexdigest @message_attributes.to_s
+    simple_message
+  end
+
+  def render
+    {
+      MessageBody: message_body
+    }
   end
 
   private
 
-  def get_message_attributes_from_params(params)
+  def self.get_message_attributes_from_params(params)
     attributes = []
     n = 1
     while params["MessageAttribute.#{n}.Name".to_sym].present? do

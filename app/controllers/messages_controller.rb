@@ -11,7 +11,7 @@ class MessagesController < ApplicationController
       return render json: {error: "Missing params: #{missing_params.join(', ')}"}, status: :unprocessable_entity
     end
 
-    simple_message = SimpleMessage.new params
+    simple_message = SimpleMessage.convert params
 
     SimpleQueue.push params[:QueueUrl], simple_message
 
@@ -31,7 +31,7 @@ class MessagesController < ApplicationController
 
     messages = []
     while message = SimpleQueue.pop( params[:QueueUrl]) do
-      messages << message
+      messages << SimpleMessage.new(message).render
       break if messages.size > MAX_NUMBER_OF_MESSAGES
     end
 
