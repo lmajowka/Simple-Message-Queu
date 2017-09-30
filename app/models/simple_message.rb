@@ -22,7 +22,10 @@ class SimpleMessage
 
   def render
     {
-      MessageBody: message_body
+      MessageBody: message_body,
+      MessageId: message_id,
+      MD5OfMessageBody: md5_of_message_body,
+      MD5OfMessageAttributes: md5_of_message_attributes
     }
   end
 

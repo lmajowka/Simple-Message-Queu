@@ -15,11 +15,7 @@ class MessagesController < ApplicationController
 
     SimpleQueue.push params[:QueueUrl], simple_message
 
-    render json: {
-      MessageId: simple_message.message_id,
-      MD5OfMessageBody: simple_message.md5_of_message_body,
-      MD5OfMessageAttributes: simple_message.md5_of_message_attributes
-    }
+    render json: simple_message.render.to_json
   end
 
   def receive_message

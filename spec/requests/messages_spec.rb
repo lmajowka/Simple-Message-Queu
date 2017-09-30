@@ -17,7 +17,8 @@ RSpec.describe 'messages', type: :request do
 
       it 'sends a simple message' do
         post '/SendMessage', params: { MessageBody: 'Message Body', QueueUrl: 'default' }
-        expect(response.status).to eq 200
+        message_result = JSON.parse response.body
+        expect(message_result['MessageId']).not_to be_empty
       end
 
     end
