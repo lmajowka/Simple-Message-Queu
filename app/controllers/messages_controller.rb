@@ -1,11 +1,14 @@
 class MessagesController < ApplicationController
 
   SEND_MESSAGE_REQUIRED_PARAMS = [:MessageBody, :QueueUrl]
+  RECEIVE_MESSAGE_REQUIRED_PARAMS = [:QueueUrl]
+  MAX_NUMBER_OF_MESSAGES = 10
 
   def send_message
 
-    if missing_send_message_required_params.presence
-      return render json: {error: "Missing params: #{missing_send_message_required_params.join(', ')}"}, status: :unprocessable_entity
+    missing_params = missing_required_params(SEND_MESSAGE_REQUIRED_PARAMS)
+    if missing_params.presence
+      return render json: {error: "Missing params: #{missing_params.join(', ')}"}, status: :unprocessable_entity
     end
 
     simple_message = SimpleMessage.new params
@@ -19,11 +22,27 @@ class MessagesController < ApplicationController
     }
   end
 
+  def receive_message
+
+    missing_params = missing_required_params(RECEIVE_MESSAGE_REQUIRED_PARAMS)
+    if missing_params.presence
+      return render json: {error: "Missing params: #{missing_params.join(', ')}"}, status: :unprocessable_entity
+    end
+
+    messages = []
+    while message = SimpleQueue.pop( params[:QueueUrl]) do
+      messages << message
+      break if messages.size > MAX_NUMBER_OF_MESSAGES
+    end
+
+    render json: {ReceiveMessageResult: messages}
+  end
+
   private
 
-  def missing_send_message_required_params
+  def missing_required_params(list_of_required_params)
     missing_required_params = []
-    SEND_MESSAGE_REQUIRED_PARAMS.each do |param|
+    list_of_required_params.each do |param|
       unless params[param].present?
         missing_required_params << param
       end
