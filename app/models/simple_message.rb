@@ -26,10 +26,21 @@ class SimpleMessage
       MessageId: message_id,
       MD5OfMessageBody: md5_of_message_body,
       MD5OfMessageAttributes: md5_of_message_attributes
-    }
+    }.merge(render_message_attributes)
   end
 
   private
+
+  def render_message_attributes
+    results = {}
+    n = 1
+    message_attributes.each do |message_attribute|
+      results["MessageAttribute.#{n}.Name"] = message_attribute['name']
+      results["MessageAttribute.#{n}.Value"] = message_attribute['value']
+      n += 1
+    end
+    results
+  end
 
   def self.get_message_attributes_from_params(params)
     attributes = []
